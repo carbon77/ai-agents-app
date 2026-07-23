@@ -11,5 +11,6 @@ dependencies = [
     "langchain-mcp-adapters>=0.3.0",
     "langgraph>=1.2.9",
     "pydantic>=2.13.4",
+    "pytest>=9.1.1",
     "python-dotenv>=1.2.2",
 ]
