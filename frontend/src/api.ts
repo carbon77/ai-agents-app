@@ -1,0 +1,25 @@
+import { Agent, AgentResponse, AgentSection } from './types/agents';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000';
+
+export async function getAgentSections(): Promise<AgentSection[]> {
+  const response = await fetch(`${API_BASE_URL}/agents/`);
+  if (!response.ok) throw new Error('Unable to load agent sections');
+  return response.json();
+}
+
+export async function getAgents(): Promise<Agent[]> {
+  const response = await fetch(`${API_BASE_URL}/agents/all`);
+  if (!response.ok) throw new Error('Unable to load agents');
+  return response.json();
+}
+
+export async function sendAgentMessage(agent: Agent, query: string): Promise<AgentResponse> {
+  const response = await fetch(`${API_BASE_URL}${agent.endpoint}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query }),
+  });
+  if (!response.ok) throw new Error('Agent request failed');
+  return response.json();
+}
