@@ -36,7 +36,7 @@ jobs:
             echo "Login Docker"
             docker login -u ${{ vars.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             echo "Pull image"
-            docker pull ${{ vars.DOCKER_USERNAME }}/ai-agent-python:latest
+            docker pull ${{ vars.DOCKER_USERNAME }}/ai-agents-python:latest
             echo "Restart containers"
             docker compose up -d
             echo "Cleanup"
