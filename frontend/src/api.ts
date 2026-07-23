@@ -1,9 +1,15 @@
-import { Agent, AgentResponse } from './types/agents';
+import { Agent, AgentResponse, AgentSection } from './types/agents';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000';
 
-export async function getAgents(): Promise<Agent[]> {
+export async function getAgentSections(): Promise<AgentSection[]> {
   const response = await fetch(`${API_BASE_URL}/agents/`);
+  if (!response.ok) throw new Error('Unable to load agent sections');
+  return response.json();
+}
+
+export async function getAgents(): Promise<Agent[]> {
+  const response = await fetch(`${API_BASE_URL}/agents/all`);
   if (!response.ok) throw new Error('Unable to load agents');
   return response.json();
 }

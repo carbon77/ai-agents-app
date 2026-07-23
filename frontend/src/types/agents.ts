@@ -5,6 +5,13 @@ export type Agent = {
   endpoint: string;
 };
 
+export type AgentSection = {
+  id: string;
+  name: string;
+  description: string;
+  agents: Agent[];
+};
+
 export type AgentResponse = {
   messages: Array<{ content: string; tool_call?: unknown }>;
   tool_calls: Array<{ call: string; result: string }>;

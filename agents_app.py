@@ -11,7 +11,14 @@ class Agent(BaseModel):
     endpoint: str
 
 
-AVAILABLE_AGENTS = [
+class AgentSection(BaseModel):
+    id: str
+    name: str
+    description: str
+    agents: list[Agent]
+
+
+PERSONAL_ASSISTANT_AGENTS = [
     Agent(
         id="calendar",
         name="Calendar Assistant",
@@ -32,6 +39,17 @@ AVAILABLE_AGENTS = [
     ),
 ]
 
+AGENT_SECTIONS = [
+    AgentSection(
+        id="personal-assistant",
+        name="Personal Assistant",
+        description="Agents for calendar scheduling, email workflows, and personal task routing.",
+        agents=PERSONAL_ASSISTANT_AGENTS,
+    )
+]
+
+AVAILABLE_AGENTS = [agent for section in AGENT_SECTIONS for agent in section.agents]
+
 tags_metadata = [
     {
         "name": "personal_assistant",
@@ -45,7 +63,12 @@ tags_metadata = [
 agents = FastAPI(openapi_tags=tags_metadata)
 
 
-@agents.get("/", response_model=list[Agent], summary="List agents", tags=["agents"])
+@agents.get("/", response_model=list[AgentSection], summary="List agent sections", tags=["agents"])
+async def list_agent_sections():
+    return AGENT_SECTIONS
+
+
+@agents.get("/all", response_model=list[Agent], summary="List all agents", tags=["agents"])
 async def list_agents():
     return AVAILABLE_AGENTS
 
