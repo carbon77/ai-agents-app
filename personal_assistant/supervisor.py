@@ -2,7 +2,7 @@ from langchain.agents import create_agent
 from langchain_core.messages import HumanMessage
 from langchain_core.tools import tool
 
-from init_models import model
+from app.init_models import model
 from personal_assistant.calendar import calendar_agent
 from personal_assistant.email import email_agent
 

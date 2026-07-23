@@ -1,7 +1,7 @@
 from langchain.agents import create_agent
 from langchain_core.messages import HumanMessage
 
-from init_models import model
+from app.init_models import model
 from personal_assistant.tools import create_calendar_event, get_available_time_slots
 
 CALENDAR_AGENT_PROMPT = (
