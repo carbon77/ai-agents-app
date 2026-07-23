@@ -33,6 +33,8 @@ jobs:
             cat > .env <<EOF
             GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
             EOF
+            echo "Login Docker"
+            docker login -u ${{ vars.DOCKER_USERNAME }} -p ${{ secrest.DOCKER_PASSWORD }}
             echo "Pull image"
             docker pull ${{ vars.DOCKER_USERNAME }}/ai-agent-python:latest
             echo "Restart containers"
