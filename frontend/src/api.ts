@@ -1,14 +1,4 @@
-export type Agent = {
-  id: string;
-  name: string;
-  description: string;
-  endpoint: string;
-};
-
-export type AgentResponse = {
-  messages: Array<{ content: string; tool_call?: unknown }>;
-  tool_calls: Array<{ call: string; result: string }>;
-};
+import { Agent, AgentResponse } from './types/agents';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000';
 
