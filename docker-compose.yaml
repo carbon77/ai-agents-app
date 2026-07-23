@@ -1,0 +1,10 @@
+services:
+  api:
+    image: mogh03/ai-agents-python:latest
+    restart: unless-stopped
+
+    ports:
+      - "8000:8000"
+
+    environment:
+      GROQ_API_KEY: ${GROQ_API_KEY}

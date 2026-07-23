@@ -1,0 +1,40 @@
+name: Deploy application
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Copy docker-compose.yml
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          source: "docker-compose.yml"
+          target: "~/deploy_app"
+      - name: Deploy application
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            cd ~/deploy_app
+            echo "Creating .env"
+            cat > .env <<EOF
+            GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
+            EOF
+            echo "Pull image"
+            docker pull ${{ vars.DOCKER_USERNAME }}/ai-agent-python:latest
+            echo "Restart containers"
+            docker compose up -d
+            echo "Cleanup"
+            docker image prune -f
