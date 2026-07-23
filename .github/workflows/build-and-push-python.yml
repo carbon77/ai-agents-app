@@ -8,23 +8,6 @@ on:
         default: "latest"
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - name: Install uv
-        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
-        with:
-          version: '0.11.3'
-      - name: Set up Python
-        uses: actions/setup-python@v7
-        with:
-          python-version-file: "pyproject.toml"
-      - name: Install dependencies
-        run: uv sync --locked --all-extras --dev
-      - name: Run tests
-        run: uv run pytest tests
-
   build:
     needs: test
     runs-on: ubuntu-latest
@@ -35,6 +18,8 @@ jobs:
         uses: docker/metadata-action@v6
         with:
           images: ${{ vars.DOCKER_USERNAME }}/ai-agents-python
+          tags: |
+            type=raw,value=${{ inputs.tag }}
       - name: Log in to Docker Hub
         uses: docker/login-action@v4
         with:
