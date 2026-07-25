@@ -13,10 +13,14 @@ all_tools = [
     escalate_to_human,
 ]
 
-customer_support_agent = create_agent(
-    chat_model_registry.get("llama-3.1-8b-instant"),
-    tools=all_tools,
-    state_schema=SupportState,
-    middleware=[apply_step_config],
-    checkpointer=InMemorySaver(),
-)
+def create_customer_support_agent(model_id: str):
+    return create_agent(
+        chat_model_registry.get(model_id),
+        tools=all_tools,
+        state_schema=SupportState,
+        middleware=[apply_step_config],
+        checkpointer=InMemorySaver(),
+    )
+
+
+customer_support_agent = create_customer_support_agent("llama-3.1-8b-instant")

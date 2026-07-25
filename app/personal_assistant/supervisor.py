@@ -48,8 +48,12 @@ SUPERVISOR_PROMPT = (
     "Break down user requests into appropriate tool calls and coordinate the results. "
     "When a request involves multiple actions, use multiple tools in sequence or in parallel as appropriate."
 )
-supervisor_agent = create_agent(
-    chat_model_registry.get("llama-3.1-8b-instant"),
-    tools=[schedule_event, manage_email],
-    system_prompt=SUPERVISOR_PROMPT,
-)
+def create_supervisor_agent(model_id: str):
+    return create_agent(
+        chat_model_registry.get(model_id),
+        tools=[schedule_event, manage_email],
+        system_prompt=SUPERVISOR_PROMPT,
+    )
+
+
+supervisor_agent = create_supervisor_agent("llama-3.1-8b-instant")
