@@ -3,7 +3,7 @@ from langchain_core.messages import HumanMessage
 from langchain_core.utils.uuid import uuid7
 
 from app.models import AgentChatRequest, AgentChatResponse
-from app.customer_support.agent import customer_support_agent
+from app.customer_support.agent import create_customer_support_agent
 
 customer_support_router = APIRouter()
 
@@ -16,7 +16,8 @@ def customer_support(query: AgentChatRequest):
     thread_id = str(uuid7())
     config = {"configurable": {"thread_id": thread_id }}
     messages = [HumanMessage(content=query.message)]
-    stream = customer_support_agent.stream_events(
+    agent = create_customer_support_agent(query.model)
+    stream = agent.stream_events(
         {"messages": messages},
         version="v3",
         config=config,

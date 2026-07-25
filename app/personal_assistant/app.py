@@ -5,8 +5,8 @@ from langchain_core.messages import HumanMessage
 from app.chat_model_registry import chat_model_registry
 from app.models import AgentChatRequest, AgentChatResponse
 from app.personal_assistant.calendar import CALENDAR_AGENT_PROMPT
-from app.personal_assistant.email import email_agent
-from app.personal_assistant.supervisor import supervisor_agent
+from app.personal_assistant.email import create_email_agent
+from app.personal_assistant.supervisor import create_supervisor_agent
 from app.personal_assistant.tools import create_calendar_event, get_available_time_slots
 
 assistant_router = APIRouter()
@@ -56,7 +56,8 @@ async def pa_calendar(query: AgentChatRequest):
                        )
 async def pa_calendar(query: AgentChatRequest):
     messages = [HumanMessage(content=query.message)]
-    stream = email_agent.stream_events(
+    agent = create_email_agent(query.model)
+    stream = agent.stream_events(
         {"messages": messages},
         version="v3",
     )
@@ -89,7 +90,8 @@ async def pa_calendar(query: AgentChatRequest):
                        )
 async def pa_supervisor(query: AgentChatRequest):
     messages = [HumanMessage(content=query.message)]
-    stream = supervisor_agent.stream_events(
+    agent = create_supervisor_agent(query.model)
+    stream = agent.stream_events(
         {"messages": messages},
         version="v3",
     )

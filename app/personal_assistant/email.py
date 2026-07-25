@@ -11,8 +11,12 @@ EMAIL_AGENT_PROMPT = (
     "Always confirm what was sent in your final response."
 )
 
-email_agent = create_agent(
-    chat_model_registry.get("llama-3.1-8b-instant"),
-    tools=[send_email],
-    system_prompt=EMAIL_AGENT_PROMPT,
-)
+def create_email_agent(model_id: str):
+    return create_agent(
+        chat_model_registry.get(model_id),
+        tools=[send_email],
+        system_prompt=EMAIL_AGENT_PROMPT,
+    )
+
+
+email_agent = create_email_agent("llama-3.1-8b-instant")
