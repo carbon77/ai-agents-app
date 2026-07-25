@@ -23,17 +23,24 @@ export function ChatInput({
         position: 'sticky',
         bottom: 16,
         display: 'flex',
+        flexDirection: 'column',
         gap: 1,
         p: 1,
+        width: '50%',
         border: '1px solid',
         borderColor: 'divider',
-        borderRadius: 3,
+        borderRadius: 1,
         bgcolor: 'background.paper',
-        boxShadow: 6,
+        boxShadow: 5,
+        alignSelf: 'center',
       }}
     >
       <TextField
         fullWidth
+        variant="outlined"
+        sx={{
+          '& fieldset': { border: 'none' },
+        }}
         label="Message"
         value={query}
         onChange={(event) => onQueryChange(event.target.value)}
@@ -41,7 +48,7 @@ export function ChatInput({
         multiline
         maxRows={4}
       />
-      <Box display="flex" alignItems="center">
+      <Box display="flex" alignItems="center" justifyContent="flex-end">
         <IconButton type="submit" color="primary" disabled={busy || disabled || !query.trim()}>
           {busy ? <CircularProgress size={24} /> : <SendIcon />}
         </IconButton>

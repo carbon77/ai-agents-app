@@ -70,31 +70,33 @@ export function ChatPage() {
 
   return (
     <Shell>
-      <Stack spacing={3}>
-        <FormControl disabled={busy || models.length === 0} sx={{ width: { xs: '100%', sm: 360 }, alignSelf: 'flex-start' }}>
-          <InputLabel id="chat-model-label">Chat model</InputLabel>
-          <Select
-            labelId="chat-model-label"
-            label="Chat model"
-            value={selectedModelId}
-            renderValue={() => selectedModel?.name ?? 'Select model'}
-            onChange={(event) => setSelectedModelId(event.target.value)}
-          >
-            {models.map((model, index) => (
-              <MenuItem key={`${model.model_id}-${index}`} value={model.model_id}>
-                <ListItemText primary={model.name} secondary={describeChatModel(model)} />
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <Stack direction="row" spacing={2} alignItems="center">
-          <Box sx={{ display: 'grid', placeItems: 'center', width: 56, height: 56, borderRadius: 3, bgcolor: 'action.hover' }}>
-            {getAgentIcon(agent?.id)}
-          </Box>
-          <Box>
-            <Typography variant="h3" fontWeight={800}>{agent?.name ?? 'Agent chat'}</Typography>
-            <Typography color="text.secondary">{agent?.description ?? 'Loading agent details...'}</Typography>
-          </Box>
+      <Stack spacing={3} alignItems="stretch">
+        <Stack direction="row" spacing={3} alignItems="center">
+          <FormControl disabled={busy || models.length === 0}>
+            <InputLabel id="chat-model-label">Chat model</InputLabel>
+            <Select
+              labelId="chat-model-label"
+              label="Chat model"
+              value={selectedModelId}
+              renderValue={() => selectedModel?.name ?? 'Select model'}
+              onChange={(event) => setSelectedModelId(event.target.value)}
+            >
+              {models.map((model, index) => (
+                <MenuItem key={`${model.model_id}-${index}`} value={model.model_id}>
+                  <ListItemText primary={model.name} secondary={describeChatModel(model)} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Box sx={{ display: 'grid', placeItems: 'center', width: 56, height: 56, borderRadius: 3, bgcolor: 'action.hover' }}>
+              {getAgentIcon(agent?.id)}
+            </Box>
+            <Box>
+              <Typography variant="h4" fontWeight={800}>{agent?.name ?? 'Agent chat'}</Typography>
+              <Typography color="text.secondary">{agent?.description ?? 'Loading agent details...'}</Typography>
+            </Box>
+          </Stack>
         </Stack>
         {error && <Alert severity="error">{error}</Alert>}
         <Box sx={{ minHeight: 420 }}>
