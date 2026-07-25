@@ -1,6 +1,10 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Alert, Box, FormControl, InputLabel, List, MenuItem, Paper, Select, Stack, Typography } from '@mui/material';
+import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import { Alert, Box, FormControl, InputLabel, List, ListItemText, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { getAgents, getChatModels, sendAgentMessage } from '../api';
 import { ChatInput } from '../components/ChatInput';
 import { ChatMessage } from '../components/ChatMessage';
@@ -9,6 +13,18 @@ import { Agent, ChatMessage as ChatMessageType, ChatModel } from '../types/agent
 
 function createMessageId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function getAgentIcon(agentId?: string) {
+  if (agentId?.includes('calendar')) return <CalendarMonthIcon color="primary" fontSize="large" />;
+  if (agentId?.includes('email')) return <AlternateEmailIcon color="primary" fontSize="large" />;
+  if (agentId?.includes('supervisor')) return <ManageAccountsIcon color="primary" fontSize="large" />;
+  return <DashboardIcon color="primary" fontSize="large" />;
+}
+
+function describeChatModel(model: ChatModel) {
+  const features = model.supported_features.length > 0 ? model.supported_features.map((feature) => feature.replaceAll('_', ' ')).join(', ') : 'standard chat';
+  return `${model.owner} · ${model.provider} · ${features}`;
 }
 
 export function ChatPage() {
@@ -31,6 +47,7 @@ export function ChatPage() {
       .catch((err) => setError(err.message));
   }, []);
   const agent = useMemo(() => agents.find((item) => item.id === agentId), [agents, agentId]);
+  const selectedModel = useMemo(() => models.find((model) => model.model_id === selectedModelId), [models, selectedModelId]);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -54,31 +71,37 @@ export function ChatPage() {
   return (
     <Shell>
       <Stack spacing={3}>
-        <Box>
-          <Typography variant="h3" fontWeight={800}>{agent?.name ?? 'Agent chat'}</Typography>
-          <Typography color="text.secondary">{agent?.description ?? 'Loading agent details...'}</Typography>
-        </Box>
-        <FormControl fullWidth disabled={busy || models.length === 0}>
+        <FormControl disabled={busy || models.length === 0} sx={{ width: { xs: '100%', sm: 360 }, alignSelf: 'flex-start' }}>
           <InputLabel id="chat-model-label">Chat model</InputLabel>
           <Select
             labelId="chat-model-label"
             label="Chat model"
             value={selectedModelId}
+            renderValue={() => selectedModel?.name ?? 'Select model'}
             onChange={(event) => setSelectedModelId(event.target.value)}
           >
             {models.map((model, index) => (
               <MenuItem key={`${model.model_id}-${index}`} value={model.model_id}>
-                {model.name} — {model.owner}
+                <ListItemText primary={model.name} secondary={describeChatModel(model)} />
               </MenuItem>
             ))}
           </Select>
         </FormControl>
+        <Stack direction="row" spacing={2} alignItems="center">
+          <Box sx={{ display: 'grid', placeItems: 'center', width: 56, height: 56, borderRadius: 3, bgcolor: 'action.hover' }}>
+            {getAgentIcon(agent?.id)}
+          </Box>
+          <Box>
+            <Typography variant="h3" fontWeight={800}>{agent?.name ?? 'Agent chat'}</Typography>
+            <Typography color="text.secondary">{agent?.description ?? 'Loading agent details...'}</Typography>
+          </Box>
+        </Stack>
         {error && <Alert severity="error">{error}</Alert>}
-        <Paper sx={{ p: 2, minHeight: 420, border: '1px solid', borderColor: 'divider' }}>
-          <List>
+        <Box sx={{ minHeight: 420 }}>
+          <List disablePadding>
             {messages.map((message) => <ChatMessage key={message.id} message={message} />)}
           </List>
-        </Paper>
+        </Box>
         <ChatInput busy={busy} disabled={!agent || !selectedModelId} query={query} onQueryChange={setQuery} onSubmit={submit} />
       </Stack>
     </Shell>
