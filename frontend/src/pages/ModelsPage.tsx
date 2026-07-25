@@ -1,12 +1,22 @@
 import { useEffect, useMemo, useState } from 'react';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import SearchIcon from '@mui/icons-material/Search';
+import TextFieldsIcon from '@mui/icons-material/TextFields';
+import AudioFileIcon from '@mui/icons-material/AudioFile';
+import SpatialAudioOffIcon from '@mui/icons-material/SpatialAudioOff';
 import { Alert, Box, Card, CardContent, Chip, CircularProgress, InputAdornment, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import { getModels } from '../api';
 import { Shell } from '../components/Shell';
 import { ChatModel } from '../types/agents';
 
 type ModelTypeFilter = 'all' | ChatModel['model_type'];
+
+function getModelTypeIcon(modelType: string) {
+  if (modelType.includes('chat_completion')) return <TextFieldsIcon color="primary" />;
+  if (modelType.includes('speech_to_text')) return <SpatialAudioOffIcon color="primary"/>
+  if (modelType.includes('text_to_speech')) return <AudioFileIcon color="primary" />;
+  return <PsychologyIcon color="primary" />;
+}
 
 function formatNumber(value: number) {
   return new Intl.NumberFormat().format(value);
@@ -66,11 +76,11 @@ export function ModelsPage() {
             value={modelTypeFilter}
             onChange={(_, value: ModelTypeFilter | null) => value && setModelTypeFilter(value)}
             aria-label="Model type filter"
-            sx={{ alignSelf: { xs: 'stretch', md: 'center' }, flexWrap: 'wrap' }}
+            sx={{ alignSelf: { xs: 'stretch', md: 'center' } }}
           >
             {modelTypeFilters.map((modelType) => (
               <ToggleButton key={modelType} value={modelType} aria-label={`Show ${getModelTypeLabel(modelType)} models`}>
-                {getModelTypeLabel(modelType)}
+                {getModelTypeIcon(modelType)}
               </ToggleButton>
             ))}
           </ToggleButtonGroup>

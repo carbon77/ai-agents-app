@@ -59,16 +59,6 @@ AI_MODELS = [
         supported_features=["tools", "json_mode", "reasoning", "structured_outputs"],
     ),
     ModelMetadata(
-        model_id="qwen/qwen3.6-27b",
-        name="Qwen 3.6 27B",
-        owner="Alibaba Cloud",
-        provider="groq",
-        context_window=131072,
-        max_completion_tokens=16384,
-        model_type="chat_completion",
-        supported_features=["tools", "json_mode", "reasoning"],
-    ),
-    ModelMetadata(
         model_id="whisper-large-v3",
         name="Whisper",
         owner="OpenAI",
