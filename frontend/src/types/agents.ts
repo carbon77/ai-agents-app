@@ -34,3 +34,9 @@ export type ChatMessage = {
   content: string;
   toolCalls?: AgentResponse['tool_calls'];
 };
+
+
+export type StreamAgentEvent = {
+  event: string;
+  data: Record<string, unknown>;
+};
