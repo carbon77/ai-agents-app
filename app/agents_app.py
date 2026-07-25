@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 
+from customer_support.app import customer_support_router
 from personal_assistant.app import assistant_router
 
 
@@ -45,7 +46,20 @@ AGENT_SECTIONS = [
         name="Personal Assistant",
         description="Agents for calendar scheduling, email workflows, and personal task routing.",
         agents=PERSONAL_ASSISTANT_AGENTS,
-    )
+    ),
+    AgentSection(
+        id="customer-support",
+        name="Customer Support",
+        description="Agents for customer support",
+        agents=[
+            Agent(
+                id="customer_support",
+                name="Customer Support Assistant",
+                description="Help customers with warranty",
+                endpoint="/agents/customer_support",
+            ),
+        ],
+    ),
 ]
 
 AVAILABLE_AGENTS = [agent for section in AGENT_SECTIONS for agent in section.agents]
@@ -59,8 +73,15 @@ tags_metadata = [
         "name": "agents",
         "description": "Metadata about agents available in this API",
     },
+    {
+        "name": "customer_support",
+        "description": "Customer support",
+    },
 ]
+
 agents = FastAPI(openapi_tags=tags_metadata)
+agents.include_router(assistant_router)
+agents.include_router(customer_support_router)
 
 
 @agents.get("/", response_model=list[AgentSection], summary="List agent sections", tags=["agents"])
@@ -71,6 +92,3 @@ async def list_agent_sections():
 @agents.get("/all", response_model=list[Agent], summary="List all agents", tags=["agents"])
 async def list_agents():
     return AVAILABLE_AGENTS
-
-
-agents.include_router(assistant_router)
