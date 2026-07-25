@@ -1,7 +1,7 @@
 from langchain.agents import create_agent
 
 from app.init_models import model
-from personal_assistant.tools import send_email
+from app.personal_assistant.tools import send_email
 
 EMAIL_AGENT_PROMPT = (
     "You are an email assistant. "

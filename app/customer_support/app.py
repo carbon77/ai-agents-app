@@ -3,7 +3,7 @@ from langchain_core.messages import HumanMessage
 from langchain_core.utils.uuid import uuid7
 
 from app.models import Query, AgentResponse
-from customer_support.agent import customer_support_agent
+from app.customer_support.agent import customer_support_agent
 
 customer_support_router = APIRouter()
 

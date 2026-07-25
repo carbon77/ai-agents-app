@@ -5,7 +5,7 @@ from langchain_core.tools import tool
 from langgraph.prebuilt import ToolRuntime
 from langgraph.types import Command
 
-from customer_support.state import SupportState
+from app.customer_support.state import SupportState
 
 
 @tool

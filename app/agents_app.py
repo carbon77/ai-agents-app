@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from customer_support.app import customer_support_router
-from personal_assistant.app import assistant_router
+from app.customer_support.app import customer_support_router
+from app.personal_assistant.app import assistant_router
 
 
 class Agent(BaseModel):

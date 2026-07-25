@@ -3,8 +3,8 @@ from langchain_core.messages import HumanMessage
 from langchain_core.tools import tool
 
 from app.init_models import model
-from personal_assistant.calendar import calendar_agent
-from personal_assistant.email import email_agent
+from app.personal_assistant.calendar import calendar_agent
+from app.personal_assistant.email import email_agent
 
 
 @tool

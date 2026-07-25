@@ -2,9 +2,9 @@ from langchain.agents import create_agent
 from langgraph.checkpoint.memory import InMemorySaver
 
 from app.init_models import model
-from customer_support.state import SupportState
-from customer_support.steps import apply_step_config
-from customer_support.tools import record_issue_type, record_warranty_status, provide_solution, escalate_to_human
+from app.customer_support.state import SupportState
+from app.customer_support.steps import apply_step_config
+from app.customer_support.tools import record_issue_type, record_warranty_status, provide_solution, escalate_to_human
 
 all_tools = [
     record_warranty_status,

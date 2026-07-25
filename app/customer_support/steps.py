@@ -2,7 +2,7 @@ from typing import Callable
 
 from langchain.agents.middleware import wrap_model_call, ModelRequest, ModelResponse
 
-from customer_support.tools import record_warranty_status, record_issue_type, provide_solution, escalate_to_human
+from app.customer_support.tools import record_warranty_status, record_issue_type, provide_solution, escalate_to_human
 
 WARRANTY_COLLECTOR_PROMPT = """You are a customer support agent helping with device issues.
 

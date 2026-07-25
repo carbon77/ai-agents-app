@@ -1,12 +1,13 @@
 from typing import List
 
 from fastapi import APIRouter
+from fastapi.sse import EventSourceResponse
 from langchain_core.messages import HumanMessage
 from pydantic import BaseModel
 
-from personal_assistant.calendar import calendar_agent
-from personal_assistant.email import email_agent
-from personal_assistant.supervisor import supervisor_agent
+from app.personal_assistant.calendar import calendar_agent
+from app.personal_assistant.email import email_agent
+from app.personal_assistant.supervisor import supervisor_agent
 
 
 class Query(BaseModel):
