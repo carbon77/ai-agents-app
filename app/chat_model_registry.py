@@ -1,3 +1,4 @@
+import logging
 from typing import Dict
 
 from dotenv import load_dotenv
@@ -7,6 +8,8 @@ from langchain_core.language_models import BaseChatModel
 from app.routers.ai_models import AI_MODELS
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 
 class ChatModelRegistry:
@@ -21,10 +24,13 @@ class ChatModelRegistry:
 
     def _create(self, model_id: str):
         for metadata in AI_MODELS:
+            logger.info(f"Creating model: {metadata}")
             if metadata.model_id == model_id:
                 model_name = f"{metadata.provider}:{metadata.model_id}"
-                print(f"Chat model created: {model_name}")
-                return init_chat_model(model_name)
+                model = init_chat_model(model_name)
+                logger.info(f"Chat model created: %s", model_name)
+                return model
+        logger.error(f"Model with id=%s not found", model_id)
         raise KeyError(f"Model with id {model_id} not found")
 
 

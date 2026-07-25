@@ -1,3 +1,5 @@
+import logging
+
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -6,6 +8,11 @@ from app.routers.agents import agents_router
 from app.routers.ai_models import models_router
 
 load_dotenv()
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(levelname)s: %(message)s",
+)
 
 tags_metadata = [
     {
