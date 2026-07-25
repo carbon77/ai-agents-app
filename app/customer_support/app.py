@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from langchain_core.messages import HumanMessage
 from langchain_core.utils.uuid import uuid7
 
-from app.models import Query, AgentResponse
+from app.models import AgentChatRequest, AgentChatResponse
 from app.customer_support.agent import customer_support_agent
 
 customer_support_router = APIRouter()
@@ -12,10 +12,10 @@ customer_support_router = APIRouter()
     summary="Customer support",
     tags=["customer_support"],
 )
-def customer_support(query: Query):
+def customer_support(query: AgentChatRequest):
     thread_id = str(uuid7())
     config = {"configurable": {"thread_id": thread_id }}
-    messages = [HumanMessage(content=query.query)]
+    messages = [HumanMessage(content=query.message)]
     stream = customer_support_agent.stream_events(
         {"messages": messages},
         version="v3",
@@ -41,4 +41,4 @@ def customer_support(query: Query):
                 "call": call,
                 "result": result,
             })
-    return AgentResponse(messages=result_messages, tool_calls=tool_calls)
+    return AgentChatResponse(messages=result_messages, tool_calls=tool_calls)

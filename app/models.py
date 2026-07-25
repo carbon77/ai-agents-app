@@ -3,10 +3,11 @@ from typing import List
 from pydantic import BaseModel
 
 
-class Query(BaseModel):
-    query: str
+class AgentChatRequest(BaseModel):
+    model: str = "llama-3.1-8b-instant"
+    message: str
 
 
-class AgentResponse(BaseModel):
+class AgentChatResponse(BaseModel):
     messages: List[dict]
     tool_calls: List[dict]

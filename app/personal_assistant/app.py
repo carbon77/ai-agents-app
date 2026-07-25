@@ -1,23 +1,13 @@
-from typing import List
-
 from fastapi import APIRouter
-from fastapi.sse import EventSourceResponse
+from langchain.agents import create_agent
 from langchain_core.messages import HumanMessage
-from pydantic import BaseModel
 
-from app.personal_assistant.calendar import calendar_agent
+from app.chat_model_registry import chat_model_registry
+from app.models import AgentChatRequest, AgentChatResponse
+from app.personal_assistant.calendar import CALENDAR_AGENT_PROMPT
 from app.personal_assistant.email import email_agent
 from app.personal_assistant.supervisor import supervisor_agent
-
-
-class Query(BaseModel):
-    query: str
-
-
-class AgentResponse(BaseModel):
-    messages: List[dict]
-    tool_calls: List[dict]
-
+from app.personal_assistant.tools import create_calendar_event, get_available_time_slots
 
 assistant_router = APIRouter()
 
@@ -26,9 +16,14 @@ assistant_router = APIRouter()
                        summary="Personal Assistant Calendar",
                        tags=["personal_assistant"]
                        )
-async def pa_calendar(query: Query):
-    messages = [HumanMessage(content=query.query)]
-    stream = calendar_agent.stream_events(
+async def pa_calendar(query: AgentChatRequest):
+    messages = [HumanMessage(content=query.message)]
+    agent = create_agent(
+        chat_model_registry.get(query.model),
+        tools=[create_calendar_event, get_available_time_slots],
+        system_prompt=CALENDAR_AGENT_PROMPT,
+    )
+    stream = agent.stream_events(
         {"messages": messages},
         version="v3",
     )
@@ -52,15 +47,15 @@ async def pa_calendar(query: Query):
                 "call": call,
                 "result": result,
             })
-    return AgentResponse(messages=result_messages, tool_calls=tool_calls)
+    return AgentChatResponse(messages=result_messages, tool_calls=tool_calls)
 
 
 @assistant_router.post("/assistant/email",
                        summary="Personal Assistant Email",
                        tags=["personal_assistant"]
                        )
-async def pa_calendar(query: Query):
-    messages = [HumanMessage(content=query.query)]
+async def pa_calendar(query: AgentChatRequest):
+    messages = [HumanMessage(content=query.message)]
     stream = email_agent.stream_events(
         {"messages": messages},
         version="v3",
@@ -85,15 +80,15 @@ async def pa_calendar(query: Query):
                 "call": call,
                 "result": result,
             })
-    return AgentResponse(messages=result_messages, tool_calls=tool_calls)
+    return AgentChatResponse(messages=result_messages, tool_calls=tool_calls)
 
 
 @assistant_router.post("/assistant/supervisor",
                        summary="Personal Assistant Supervisor",
                        tags=["personal_assistant"]
                        )
-async def pa_supervisor(query: Query):
-    messages = [HumanMessage(content=query.query)]
+async def pa_supervisor(query: AgentChatRequest):
+    messages = [HumanMessage(content=query.message)]
     stream = supervisor_agent.stream_events(
         {"messages": messages},
         version="v3",
@@ -118,4 +113,4 @@ async def pa_supervisor(query: Query):
                 "call": call,
                 "result": result,
             })
-    return AgentResponse(messages=result_messages, tool_calls=tool_calls)
+    return AgentChatResponse(messages=result_messages, tool_calls=tool_calls)

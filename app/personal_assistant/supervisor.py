@@ -2,7 +2,7 @@ from langchain.agents import create_agent
 from langchain_core.messages import HumanMessage
 from langchain_core.tools import tool
 
-from app.init_models import model
+from app.chat_model_registry import chat_model_registry
 from app.personal_assistant.calendar import calendar_agent
 from app.personal_assistant.email import email_agent
 
@@ -23,6 +23,7 @@ def schedule_event(request: str) -> str:
     })
     return result["messages"][-1].text
 
+
 @tool
 def manage_email(request: str) -> str:
     """Send emails using natural language.
@@ -40,6 +41,7 @@ def manage_email(request: str) -> str:
     })
     return result["messages"][-1].text
 
+
 SUPERVISOR_PROMPT = (
     "You are a helpful personal assistant. "
     "You can schedule calendar events and send emails. "
@@ -47,7 +49,7 @@ SUPERVISOR_PROMPT = (
     "When a request involves multiple actions, use multiple tools in sequence or in parallel as appropriate."
 )
 supervisor_agent = create_agent(
-    model,
+    chat_model_registry.get("llama-3.1-8b-instant"),
     tools=[schedule_event, manage_email],
     system_prompt=SUPERVISOR_PROMPT,
 )

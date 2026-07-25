@@ -1,7 +1,6 @@
 from langchain.agents import create_agent
-from langchain_core.messages import HumanMessage
 
-from app.init_models import model
+from app.chat_model_registry import chat_model_registry
 from app.personal_assistant.tools import create_calendar_event, get_available_time_slots
 
 CALENDAR_AGENT_PROMPT = (
@@ -15,22 +14,7 @@ CALENDAR_AGENT_PROMPT = (
 )
 
 calendar_agent = create_agent(
-    model,
+    chat_model_registry.get("llama-3.1-8b-instant"),
     tools=[create_calendar_event, get_available_time_slots],
     system_prompt=CALENDAR_AGENT_PROMPT,
 )
-
-if __name__ == "__main__":
-    query = "Schedule a team meeting next Tuesday"
-    stream = calendar_agent.stream_events(
-        {"messages": [HumanMessage(content=query)]},
-        version="v3",
-    )
-
-    for kind, item in stream.interleave("messages", "tool_calls"):
-        if kind == "message":
-            for token in item.text:
-                print(token, end="", flush=True)
-        elif kind == "tool_calls":
-            print(f"\nTool call: {item.tool_name}({item.input})")
-            print(f"Tool result: {item.output}")

@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import APIRouter
 from pydantic import BaseModel
 
 from app.customer_support.app import customer_support_router
@@ -64,31 +64,18 @@ AGENT_SECTIONS = [
 
 AVAILABLE_AGENTS = [agent for section in AGENT_SECTIONS for agent in section.agents]
 
-tags_metadata = [
-    {
-        "name": "personal_assistant",
-        "description": "Personal Assistant. The agent can schedule calendar event and manage emails",
-    },
-    {
-        "name": "agents",
-        "description": "Metadata about agents available in this API",
-    },
-    {
-        "name": "customer_support",
-        "description": "Customer support",
-    },
-]
-
-agents = FastAPI(openapi_tags=tags_metadata)
-agents.include_router(assistant_router)
-agents.include_router(customer_support_router)
+agents_router = APIRouter(
+    prefix="/agents"
+)
+agents_router.include_router(assistant_router)
+agents_router.include_router(customer_support_router)
 
 
-@agents.get("/", response_model=list[AgentSection], summary="List agent sections", tags=["agents"])
+@agents_router.get("/", response_model=list[AgentSection], summary="List agent sections", tags=["agents"])
 async def list_agent_sections():
     return AGENT_SECTIONS
 
 
-@agents.get("/all", response_model=list[Agent], summary="List all agents", tags=["agents"])
+@agents_router.get("/all", response_model=list[Agent], summary="List all agents", tags=["agents"])
 async def list_agents():
     return AVAILABLE_AGENTS

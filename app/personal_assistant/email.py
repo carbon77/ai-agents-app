@@ -1,6 +1,6 @@
 from langchain.agents import create_agent
 
-from app.init_models import model
+from app.chat_model_registry import chat_model_registry
 from app.personal_assistant.tools import send_email
 
 EMAIL_AGENT_PROMPT = (
@@ -12,7 +12,7 @@ EMAIL_AGENT_PROMPT = (
 )
 
 email_agent = create_agent(
-    model,
+    chat_model_registry.get("llama-3.1-8b-instant"),
     tools=[send_email],
     system_prompt=EMAIL_AGENT_PROMPT,
 )
