@@ -45,13 +45,12 @@ export function ChatPage() {
   return (
     <Shell>
       <Stack spacing={3}>
-        <Button onClick={() => navigate('/')} sx={{ alignSelf: 'flex-start' }}>Back to agents</Button>
         <Box>
           <Typography variant="h3" fontWeight={800}>{agent?.name ?? 'Agent chat'}</Typography>
           <Typography color="text.secondary">{agent?.description ?? 'Loading agent details...'}</Typography>
         </Box>
         {error && <Alert severity="error">{error}</Alert>}
-        <Paper elevation={0} sx={{ p: 2, minHeight: 420, border: '1px solid', borderColor: 'divider' }}>
+        <Paper sx={{ p: 2, minHeight: 420, border: '1px solid', borderColor: 'divider' }}>
           <List>
             {messages.map((message) => <ChatMessage key={message.id} message={message} />)}
           </List>

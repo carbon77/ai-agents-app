@@ -14,11 +14,11 @@ export async function getAgents(): Promise<Agent[]> {
   return response.json();
 }
 
-export async function sendAgentMessage(agent: Agent, query: string): Promise<AgentResponse> {
+export async function sendAgentMessage(agent: Agent, message: string): Promise<AgentResponse> {
   const response = await fetch(`${API_BASE_URL}${agent.endpoint}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query }),
+    body: JSON.stringify({ message }),
   });
   if (!response.ok) throw new Error('Agent request failed');
   return response.json();
