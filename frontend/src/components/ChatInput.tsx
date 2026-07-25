@@ -1,6 +1,6 @@
 import { FormEvent } from 'react';
 import SendIcon from '@mui/icons-material/Send';
-import { Box, CircularProgress, IconButton, Paper, TextField } from '@mui/material';
+import { Box, CircularProgress, IconButton, TextField } from '@mui/material';
 
 export function ChatInput({
   busy,
@@ -16,10 +16,9 @@ export function ChatInput({
   onSubmit: (event: FormEvent) => void;
 }) {
   return (
-    <Paper
+    <Box
       component="form"
       onSubmit={onSubmit}
-      elevation={6}
       sx={{
         position: 'sticky',
         bottom: 16,
@@ -28,6 +27,9 @@ export function ChatInput({
         p: 1,
         border: '1px solid',
         borderColor: 'divider',
+        borderRadius: 3,
+        bgcolor: 'background.paper',
+        boxShadow: 6,
       }}
     >
       <TextField
@@ -44,6 +46,6 @@ export function ChatInput({
           {busy ? <CircularProgress size={24} /> : <SendIcon />}
         </IconButton>
       </Box>
-    </Paper>
+    </Box>
   );
 }
