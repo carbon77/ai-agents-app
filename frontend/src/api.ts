@@ -1,3 +1,4 @@
+import { EventStreamContentType, fetchEventSource } from '@microsoft/fetch-event-source';
 import { Agent, AgentResponse, AgentSection, ChatModel, StreamAgentEvent } from './types/agents';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000';
@@ -38,56 +39,32 @@ export async function sendAgentMessage(agent: Agent, message: string, model: str
   return response.json();
 }
 
-function parseSseEvent(rawEvent: string): StreamAgentEvent | undefined {
-  const eventName = rawEvent
-    .split('\n')
-    .find((line) => line.startsWith('event:'))
-    ?.replace('event:', '')
-    .trim();
-  const data = rawEvent
-    .split('\n')
-    .filter((line) => line.startsWith('data:'))
-    .map((line) => line.replace('data:', '').trim())
-    .join('\n');
-
-  if (!eventName || !data) return undefined;
-  return { event: eventName, data: JSON.parse(data) };
-}
-
 export async function streamCalendarAgentMessage(
   message: string,
   model: string,
   onEvent: (event: StreamAgentEvent) => void,
 ): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/agents/assistant/calendar`, {
+  await fetchEventSource(`${API_BASE_URL}/agents/assistant/calendar`, {
     method: 'POST',
     headers: {
-      Accept: 'text/event-stream',
+      Accept: EventStreamContentType,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ message, model }),
+    async onopen(response) {
+      if (!response.ok) throw new Error('Calendar agent stream failed');
+
+      const contentType = response.headers.get('content-type') ?? '';
+      if (!contentType.startsWith(EventStreamContentType)) {
+        throw new Error('Calendar agent did not return an SSE stream');
+      }
+    },
+    onmessage(event) {
+      if (!event.event || !event.data) return;
+      onEvent({ event: event.event, data: JSON.parse(event.data) });
+    },
+    onerror(error) {
+      throw error;
+    },
   });
-
-  if (!response.ok || !response.body) throw new Error('Calendar agent stream failed');
-
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = '';
-
-  while (true) {
-    const { done, value } = await reader.read();
-    buffer += decoder.decode(value, { stream: !done });
-    const events = buffer.split('\n\n');
-    buffer = events.pop() ?? '';
-
-    for (const rawEvent of events) {
-      const parsedEvent = parseSseEvent(rawEvent);
-      if (parsedEvent) onEvent(parsedEvent);
-    }
-
-    if (done) break;
-  }
-
-  const parsedEvent = parseSseEvent(buffer);
-  if (parsedEvent) onEvent(parsedEvent);
 }
