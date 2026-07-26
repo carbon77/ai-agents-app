@@ -1,6 +1,8 @@
 import BuildIcon from "@mui/icons-material/Build";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import {
   Alert,
@@ -8,10 +10,13 @@ import {
   Card,
   CardContent,
   Chip,
+  Collapse,
+  IconButton,
   LinearProgress,
   Stack,
   Typography,
 } from "@mui/material";
+import { useState } from "react";
 import { ToolCall } from "../types/agents";
 
 const ToolCallStatusChip = ({ toolCall }: { toolCall: ToolCall }) => {
@@ -62,21 +67,29 @@ const ToolCallResult = ({ toolCall }: { toolCall: ToolCall }) => {
 };
 
 export const ToolCallMessageCard = ({ toolCall }: { toolCall: ToolCall }) => {
+  const [expanded, setExpanded] = useState<boolean>(false);
+  const handleExpandClick = () => setExpanded(!expanded);
+
   return (
     <Card
       variant="outlined"
       sx={{
         bgcolor: "background.paper",
         borderColor: "divider",
+        minWidth: "700px",
+        maxWidth: "700px",
       }}
     >
-      <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
-        <Stack>
+      <CardContent sx={{ p: 1, px: 2, "&:last-child": { pb: 1 } }}>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+        >
           <Stack
             justifyContent="space-between"
             alignItems="flex-start"
             spacing={1}
-            mb={1.5}
           >
             <Stack direction="row" spacing={1} alignItems="center" flex={1}>
               <BuildIcon fontSize="small" color="action" />
@@ -94,12 +107,18 @@ export const ToolCallMessageCard = ({ toolCall }: { toolCall: ToolCall }) => {
               <ToolCallStatusChip toolCall={toolCall} />
             </Stack>
           </Stack>
-
+          <IconButton onClick={handleExpandClick} size="small">
+            {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          </IconButton>
+        </Stack>
+      </CardContent>
+      <Collapse in={expanded} unmountOnExit>
+        <CardContent sx={{ p: 0, px: 2, "&:last-child": { pb: 2 } }}>
           <Box>
             <ToolCallResult toolCall={toolCall} />
           </Box>
-        </Stack>
-      </CardContent>
+        </CardContent>
+      </Collapse>
     </Card>
   );
 };
