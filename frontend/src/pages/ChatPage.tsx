@@ -14,7 +14,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getAgents, getChatModels, streamAgentResponse } from "../api";
 import { ChatInput } from "../components/ChatInput";
@@ -30,7 +30,7 @@ function createMessageId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
-function getAgentIcon(agentId?: string) {
+const AgentIcon = ({ agentId }: { agentId?: string }) => {
   if (agentId?.includes("calendar"))
     return <CalendarMonthIcon color="primary" fontSize="large" />;
   if (agentId?.includes("email"))
@@ -38,7 +38,7 @@ function getAgentIcon(agentId?: string) {
   if (agentId?.includes("supervisor"))
     return <ManageAccountsIcon color="primary" fontSize="large" />;
   return <DashboardIcon color="primary" fontSize="large" />;
-}
+};
 
 function describeChatModel(model: ChatModel) {
   const features =
@@ -60,11 +60,23 @@ export function ChatPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string>();
 
+  function updateMessage(
+    messageId: string,
+    update: (item: ChatMessageType) => Partial<ChatMessageType>,
+  ) {
+    setMessages((items) =>
+      items.map((item) =>
+        item.id === messageId ? { ...item, ...update(item) } : item,
+      ),
+    );
+  }
+
   useEffect(() => {
     getAgents()
       .then(setAgents)
       .catch((err) => setError(err.message));
   }, []);
+
   useEffect(() => {
     getChatModels()
       .then((items) => {
@@ -73,6 +85,7 @@ export function ChatPage() {
       })
       .catch((err) => setError(err.message));
   }, []);
+
   const agent = useMemo(
     () => agents.find((item) => item.id === agentId),
     [agents, agentId],
@@ -82,15 +95,21 @@ export function ChatPage() {
     [models, selectedModelId],
   );
 
-  async function submit(event: FormEvent) {
+  async function submit(event: SubmitEvent) {
     event.preventDefault();
     if (!agent || !selectedModelId || !query.trim()) return;
     const userMessage = query.trim();
     const agentMessageId = createMessageId();
     let firstToken = true;
+
     setMessages((items) => [
       ...items,
-      { id: createMessageId(), role: "user", content: userMessage },
+      {
+        id: createMessageId(),
+        role: "user",
+        content: userMessage,
+        toolCalls: [],
+      },
       {
         id: agentMessageId,
         role: "agent",
@@ -103,53 +122,43 @@ export function ChatPage() {
     setError(undefined);
     try {
       await streamAgentResponse(agent, selectedModel, userMessage, (event) => {
-        console.log(`${event.type} event`);
-        if (event.type === "message_token") {
-          setMessages((items) =>
-            items.map((item) =>
-              item.id === agentMessageId
-                ? {
-                    ...item,
-                    content:
-                      (firstToken ? "" : item.content) + event.data.token,
-                  }
-                : item,
-            ),
-          );
-        } else if (event.type === "tool_call_start") {
-          setMessages((items) =>
-            items.map((item) =>
-              item.id === agentMessageId
-                ? {
-                    ...item,
-                    content:
-                      (firstToken ? "" : item.content) +
-                      "\n\n" +
-                      event.data.call,
-                  }
-                : item,
-            ),
-          );
-        } else if (event.type === "tool_call_end") {
-          setMessages((items) =>
-            items.map((item) =>
-              item.id === agentMessageId
-                ? {
-                    ...item,
-                    content:
-                      item.content +
-                      "\n" +
-                      "result: " +
-                      event.data.output.content +
-                      "\n",
-                  }
-                : item,
-            ),
-          );
+        console.log(`${event.type} event`, event.data);
+        if (firstToken) {
+          updateMessage(agentMessageId, (_) => ({ content: "" }));
+          firstToken = false;
         }
 
-        if (firstToken) {
-          firstToken = false;
+        if (event.type === "message_token") {
+          updateMessage(agentMessageId, (item) => ({
+            content: item.content + event.data.token,
+          }));
+        } else if (event.type === "error") {
+          updateMessage(agentMessageId, (item) => ({
+            error: event.data.message,
+          }));
+        } else if (event.type === "tool_call_start") {
+          updateMessage(agentMessageId, (item) => ({
+            toolCalls: [
+              ...item.toolCalls,
+              {
+                call: event.data.call,
+                name: event.data.name,
+                input: event.data.input,
+              },
+            ],
+          }));
+        } else if (event.type === "tool_call_end") {
+          updateMessage(agentMessageId, (item) => ({
+            toolCalls: item.toolCalls?.map((tc) =>
+              tc.call === event.data.call
+                ? {
+                    ...tc,
+                    result: event.data.output?.content,
+                    error: event.data.error,
+                  }
+                : tc,
+            ),
+          }));
         }
       });
     } finally {
@@ -194,7 +203,7 @@ export function ChatPage() {
                 bgcolor: "action.hover",
               }}
             >
-              {getAgentIcon(agent?.id)}
+              <AgentIcon agentId={agent?.id} />
             </Box>
             <Box>
               <Typography variant="h4" fontWeight={800}>
