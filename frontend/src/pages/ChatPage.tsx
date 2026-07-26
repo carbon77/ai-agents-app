@@ -2,23 +2,13 @@ import AlternateEmailIcon from "@mui/icons-material/AlternateEmail";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
-import {
-  Alert,
-  Box,
-  FormControl,
-  InputLabel,
-  List,
-  ListItemText,
-  MenuItem,
-  Select,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Alert, Box, List, Stack, Typography } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getAgents, getChatModels, streamAgentResponse } from "../api";
+import { getAgents, streamAgentResponse } from "../api";
 import { ChatInput } from "../components/ChatInput";
 import { ChatMessage } from "../components/ChatMessage";
+import { ModelSelect } from "../components/ModelSelect";
 import { Shell } from "../components/Shell";
 import {
   Agent,
@@ -40,22 +30,11 @@ const AgentIcon = ({ agentId }: { agentId?: string }) => {
   return <DashboardIcon color="primary" fontSize="large" />;
 };
 
-function describeChatModel(model: ChatModel) {
-  const features =
-    model.supported_features.length > 0
-      ? model.supported_features
-          .map((feature) => feature.replaceAll("_", " "))
-          .join(", ")
-      : "standard chat";
-  return `${model.owner} · ${model.provider} · ${features}`;
-}
-
 export function ChatPage() {
   const { agentId } = useParams();
   const [agents, setAgents] = useState<Agent[]>([]);
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
-  const [models, setModels] = useState<ChatModel[]>([]);
-  const [selectedModelId, setSelectedModelId] = useState("");
+  const [selectedModel, setSelectedModel] = useState<ChatModel | null>(null);
   const [query, setQuery] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string>();
@@ -77,27 +56,14 @@ export function ChatPage() {
       .catch((err) => setError(err.message));
   }, []);
 
-  useEffect(() => {
-    getChatModels()
-      .then((items) => {
-        setModels(items);
-        setSelectedModelId((current) => current || items[0]?.model_id || "");
-      })
-      .catch((err) => setError(err.message));
-  }, []);
-
   const agent = useMemo(
     () => agents.find((item) => item.id === agentId),
     [agents, agentId],
   );
-  const selectedModel = useMemo(
-    () => models.find((model) => model.model_id === selectedModelId),
-    [models, selectedModelId],
-  );
 
   async function submit(event: SubmitEvent) {
     event.preventDefault();
-    if (!agent || !selectedModelId || !query.trim()) return;
+    if (!agent || !selectedModel || !query.trim()) return;
     const userMessage = query.trim();
     const agentMessageId = createMessageId();
     let firstToken = true;
@@ -170,28 +136,12 @@ export function ChatPage() {
     <Shell>
       <Stack spacing={3} alignItems="stretch">
         <Stack direction="row" spacing={3} alignItems="center">
-          <FormControl disabled={busy || models.length === 0}>
-            <InputLabel id="chat-model-label">Chat model</InputLabel>
-            <Select
-              labelId="chat-model-label"
-              label="Chat model"
-              value={selectedModelId}
-              renderValue={() => selectedModel?.name ?? "Select model"}
-              onChange={(event) => setSelectedModelId(event.target.value)}
-            >
-              {models.map((model, index) => (
-                <MenuItem
-                  key={`${model.model_id}-${index}`}
-                  value={model.model_id}
-                >
-                  <ListItemText
-                    primary={model.name}
-                    secondary={describeChatModel(model)}
-                  />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <ModelSelect
+            selectedModel={selectedModel}
+            setSelectedModel={setSelectedModel}
+            setError={setError}
+            busy={busy}
+          />
           <Stack direction="row" spacing={2} alignItems="center">
             <Box
               sx={{
@@ -225,7 +175,7 @@ export function ChatPage() {
         </Box>
         <ChatInput
           busy={busy}
-          disabled={!agent || !selectedModelId}
+          disabled={!agent || !selectedModel}
           query={query}
           onQueryChange={setQuery}
           onSubmit={submit}
