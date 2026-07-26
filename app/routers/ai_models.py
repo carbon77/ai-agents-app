@@ -10,7 +10,7 @@ class ModelMetadata(BaseModel):
     model_id: str
     name: str
     owner: str
-    provider: Literal["groq"]
+    provider: str
     context_window: int
     max_completion_tokens: int
     supported_features: List[str]
@@ -18,6 +18,26 @@ class ModelMetadata(BaseModel):
 
 
 AI_MODELS = [
+    ModelMetadata(
+        model_id="GigaChat-2",
+        name="GigaChat-2 Lite",
+        owner="Sber",
+        provider="gigachat",
+        context_window=128000,
+        max_completion_tokens=32760,
+        model_type="chat_completion",
+        supported_features=["tools"],
+    ),
+    ModelMetadata(
+        model_id="GigaChat-2-Max",
+        name="GigaChat-2 Max",
+        owner="Sber",
+        provider="gigachat",
+        context_window=128000,
+        max_completion_tokens=32760,
+        model_type="chat_completion",
+        supported_features=["tools"],
+    ),
     ModelMetadata(
         model_id="llama-3.3-70b-versatile",
         name="Llama 3.3 70B",
