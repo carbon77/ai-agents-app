@@ -20,17 +20,32 @@ export type ChatModel = {
   context_window: number;
   max_completion_tokens: number;
   supported_features: string[];
-  model_type: 'chat_completion' | 'speech_to_text' | 'text_to_speech';
+  model_type: "chat_completion" | "speech_to_text" | "text_to_speech";
 };
 
 export type AgentResponse = {
   messages: Array<{ content: string; tool_call?: unknown }>;
-  tool_calls: Array<{ call: string; result: string }>;
+  tool_calls: Array<{ name: string; result: string }>;
+};
+
+export type ToolCall = {
+  call: string;
+  name: string;
+  input: Record<string, unknown>;
+  delta?: any;
+  result?: string;
+  error?: string;
 };
 
 export type ChatMessage = {
   id: string;
-  role: 'user' | 'agent';
+  role: "user" | "agent";
   content: string;
-  toolCalls?: AgentResponse['tool_calls'];
+  error?: string;
+  toolCalls: ToolCall[];
+};
+
+export type StreamingAgentEvent = {
+  type: string;
+  payload: Record<string, unknown>;
 };
