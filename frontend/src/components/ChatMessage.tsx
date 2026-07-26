@@ -46,11 +46,11 @@ export const ChatMessage = ({ message }: { message: ChatMessageType }) => {
         <Paper
           elevation={0}
           sx={{
-            p: 2,
-            bgcolor: isUser ? "primary.main" : "grey.100",
+            p: 1.5,
+            bgcolor: isUser ? "primary.main" : "transparent",
             color: isUser ? "primary.contrastText" : "text.primary",
             border: "1px solid",
-            borderColor: isUser ? "primary.dark" : "divider",
+            borderColor: isUser ? "primary.dark" : "transparent",
           }}
         >
           {message.error ? (
