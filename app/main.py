@@ -1,9 +1,12 @@
 import logging
+from contextlib import asynccontextmanager
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.auth.app import auth_router
+from app.db.db import engine, Base
 from app.routers.agents import agents_router
 from app.routers.ai_models import models_router
 
@@ -13,6 +16,17 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s %(name)s: %(message)s",
 )
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+    yield
+
+    await engine.dispose()
+
 
 tags_metadata = [
     {
@@ -31,10 +45,15 @@ tags_metadata = [
         "name": "customer_support",
         "description": "Customer support",
     },
+    {
+        "name": "auth",
+        "description": "Authorization",
+    },
 ]
-app = FastAPI(openapi_tags=tags_metadata)
+app = FastAPI(openapi_tags=tags_metadata, lifespan=lifespan)
 app.include_router(agents_router)
 app.include_router(models_router)
+app.include_router(auth_router)
 
 app.add_middleware(
     CORSMiddleware,
