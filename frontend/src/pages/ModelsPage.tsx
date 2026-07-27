@@ -18,8 +18,8 @@ import {
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
-import { getModels } from "../api";
-import { Shell } from "../components/Shell";
+import { getModels } from "../api/agents";
+import { Shell } from "../components/shell/Shell";
 import { ChatModel } from "../types/agents";
 
 type ModelTypeFilter = "all" | ChatModel["model_type"];

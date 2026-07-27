@@ -3,3 +3,11 @@ export type User = {
   email: string;
   createdAt: string;
 };
+
+export type Conversation = {
+  id: string;
+  title: string;
+  createdAt: string;
+  userId: string;
+};
+export type ConversationsGroupBy = "none" | "date";

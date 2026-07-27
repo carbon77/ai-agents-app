@@ -5,7 +5,12 @@ import {
   useEffect,
   useState,
 } from "react";
-import { API_BASE_URL, apiFetch, getAccessToken, setAccessToken } from "../api";
+import {
+  API_BASE_URL,
+  apiFetch,
+  getAccessToken,
+  setAccessToken,
+} from "../api/api";
 import { User } from "../types/users";
 
 const AuthContext = createContext<{
