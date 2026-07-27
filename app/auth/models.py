@@ -1,9 +1,19 @@
 from datetime import datetime
 
+from pydantic import BaseModel
 from sqlalchemy import Text, DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.db import Base
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    username: str | None = None
 
 
 class User(Base):
