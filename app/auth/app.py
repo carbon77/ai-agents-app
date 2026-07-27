@@ -4,7 +4,7 @@ from typing import Annotated
 
 import jwt
 from fastapi import APIRouter, HTTPException, status, Depends
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
 from jwt import InvalidTokenError
 from pwdlib import PasswordHash
 from pydantic import BaseModel
@@ -103,16 +103,21 @@ async def create_user(
     await session.commit()
 
 
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+
 @auth_router.post(
     "/token",
     tags=["auth"],
     summary="Log in for access token",
 )
 async def login_for_access_token(
-        form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+        request: LoginRequest,
         session: Annotated[AsyncSession, Depends(get_session)],
 ) -> Token:
-    user = await authenticate_user(session, form_data.username, form_data.password)
+    user = await authenticate_user(session, request.username, request.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -135,5 +140,7 @@ async def read_users_me(
         current_user: Annotated[User, Depends(get_current_user)],
 ) -> dict:
     return {
+        "id": current_user.id,
         "email": current_user.email,
+        "created_at": current_user.created_at,
     }
