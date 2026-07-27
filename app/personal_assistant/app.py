@@ -6,13 +6,13 @@ from fastapi.sse import EventSourceResponse, ServerSentEvent
 from langchain.agents import create_agent
 from langchain_core.messages import HumanMessage
 
-from app.chat_model_registry import chat_model_registry
-from app.models import AgentChatRequest
+from app.agents.registry import chat_model_registry
+from app.agents.models import AgentChatRequest
 from app.personal_assistant.calendar import CALENDAR_AGENT_PROMPT
 from app.personal_assistant.email import create_email_agent
 from app.personal_assistant.supervisor import create_supervisor_agent
 from app.personal_assistant.tools import create_calendar_event, get_available_time_slots
-from app.sse import stream_agent_event, sse_event
+from app.agents.sse import stream_agent_event, sse_event
 
 assistant_router = APIRouter()
 

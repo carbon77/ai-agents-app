@@ -7,8 +7,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.auth.app import auth_router
 from app.db.db import engine, Base
-from app.routers.agents import agents_router
-from app.routers.ai_models import models_router
+from app.agents.agents import agents_router
+from app.agents.ai_models import models_router
 
 load_dotenv()
 

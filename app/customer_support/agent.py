@@ -4,7 +4,7 @@ from langgraph.checkpoint.memory import InMemorySaver
 from app.customer_support.state import SupportState
 from app.customer_support.steps import apply_step_config
 from app.customer_support.tools import record_issue_type, record_warranty_status, provide_solution, escalate_to_human
-from app.chat_model_registry import chat_model_registry
+from app.agents.registry import chat_model_registry
 
 all_tools = [
     record_warranty_status,

@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from langchain_core.messages import HumanMessage
 from langchain_core.utils.uuid import uuid7
 
-from app.models import AgentChatRequest, AgentChatResponse
+from app.agents.models import AgentChatRequest, AgentChatResponse
 from app.customer_support.agent import create_customer_support_agent
 
 customer_support_router = APIRouter()
