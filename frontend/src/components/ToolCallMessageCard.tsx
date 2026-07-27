@@ -51,14 +51,22 @@ const ToolCallStatusChip = ({ toolCall }: { toolCall: ToolCall }) => {
 const ToolCallResult = ({ toolCall }: { toolCall: ToolCall }) => {
   if (toolCall.error) {
     return (
-      <Alert sx={{ fontFamily: "monospace" }} severity="error">
+      <Alert
+        variant="outlined"
+        sx={{ fontFamily: "monospace" }}
+        severity="error"
+      >
         {toolCall.error}
       </Alert>
     );
   }
   if (toolCall.result) {
     return (
-      <Alert sx={{ fontFamily: "monospace" }} severity="success">
+      <Alert
+        variant="outlined"
+        sx={{ fontFamily: "monospace" }}
+        severity="success"
+      >
         {toolCall.result}
       </Alert>
     );
