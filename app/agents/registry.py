@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
 from langchain_core.language_models import BaseChatModel
 
-from app.routers.ai_models import AI_MODELS
+from app.agents.ai_models import AI_MODELS
 
 load_dotenv()
 

@@ -4,7 +4,7 @@ from typing import Annotated
 
 import jwt
 from fastapi import APIRouter, HTTPException, status, Depends
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt import InvalidTokenError
 from pwdlib import PasswordHash
 from pydantic import BaseModel
@@ -24,7 +24,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 password_hash = PasswordHash.recommended()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
 
 async def get_user(
@@ -114,10 +114,10 @@ class LoginRequest(BaseModel):
     summary="Log in for access token",
 )
 async def login_for_access_token(
-        request: LoginRequest,
+        form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
         session: Annotated[AsyncSession, Depends(get_session)],
 ) -> Token:
-    user = await authenticate_user(session, request.username, request.password)
+    user = await authenticate_user(session, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

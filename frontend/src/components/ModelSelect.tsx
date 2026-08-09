@@ -6,7 +6,7 @@ import {
   Select,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { getChatModels } from "../api";
+import { getChatModels } from "../api/agents";
 import { ChatModel } from "../types/agents";
 
 function describeChatModel(model: ChatModel) {

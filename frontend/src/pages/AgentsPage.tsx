@@ -26,8 +26,8 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { getAgentSections } from "../api";
-import { Shell } from "../components/Shell";
+import { getAgentSections } from "../api/agents";
+import { Shell } from "../components/shell/Shell";
 import { Agent, AgentSection } from "../types/agents";
 
 type LayoutMode = "all" | "sections";

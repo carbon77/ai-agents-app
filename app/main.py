@@ -6,9 +6,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.auth.app import auth_router
+from app.conversations.router import conversations_router
 from app.db.db import engine, Base
-from app.routers.agents import agents_router
-from app.routers.ai_models import models_router
+from app.agents.agents import agents_router
+from app.agents.ai_models import models_router
 
 load_dotenv()
 
@@ -49,11 +50,16 @@ tags_metadata = [
         "name": "auth",
         "description": "Authorization",
     },
+    {
+        "name": "conversations",
+        "description": "User conversations",
+    },
 ]
 app = FastAPI(openapi_tags=tags_metadata, lifespan=lifespan)
 app.include_router(agents_router)
 app.include_router(models_router)
 app.include_router(auth_router)
+app.include_router(conversations_router)
 
 app.add_middleware(
     CORSMiddleware,

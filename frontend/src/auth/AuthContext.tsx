@@ -5,7 +5,12 @@ import {
   useEffect,
   useState,
 } from "react";
-import { API_BASE_URL, apiFetch, getAccessToken, setAccessToken } from "../api";
+import {
+  API_BASE_URL,
+  apiFetch,
+  getAccessToken,
+  setAccessToken,
+} from "../api/api";
 import { User } from "../types/users";
 
 const AuthContext = createContext<{
@@ -45,13 +50,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [fetchCurrentUser]);
 
   const login = async (email: string, password: string) => {
+    const formData = new FormData();
+    formData.append("username", email);
+    formData.append("password", password);
+
     const res = await fetch(`${API_BASE_URL}/auth/token`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username: email,
-        password: password,
-      }),
+      body: formData,
     });
 
     if (!res.ok) {

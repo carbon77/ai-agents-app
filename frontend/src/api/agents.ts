@@ -5,56 +5,17 @@ import {
   AgentSection,
   ChatModel,
   StreamingAgentEvent,
-} from "./types/agents";
-
-export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
-
-export function getAccessToken(): string | null {
-  return localStorage.getItem("accessToken");
-}
-
-export function setAccessToken(token: string | null): void {
-  if (token) {
-    localStorage.setItem("accessToken", token);
-  } else {
-    localStorage.removeItem("accessToken");
-  }
-}
-
-export async function apiFetch(
-  path: string,
-  options: RequestInit = {},
-): Promise<Response> {
-  const token = getAccessToken();
-  const headers = {
-    ...(options.headers || {}),
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
-
-  const res = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    headers,
-  });
-
-  if (res.status === 401) {
-    setAccessToken(null);
-    window.location.href = "/login";
-    throw new Error("Unauthorized");
-  }
-
-  return res;
-}
+} from "../types/agents";
+import { API_BASE_URL, apiFetch } from "./api";
 
 export async function getAgentSections(): Promise<AgentSection[]> {
-  const response = await fetch(`${API_BASE_URL}/agents/`);
+  const response = await apiFetch(`/agents/`);
   if (!response.ok) throw new Error("Unable to load agent sections");
   return response.json();
 }
 
 export async function getAgents(): Promise<Agent[]> {
-  const response = await fetch(`${API_BASE_URL}/agents/all`);
-  response.headers;
+  const response = await apiFetch(`/agents/all`);
   if (!response.ok) throw new Error("Unable to load agents");
   return response.json();
 }
@@ -62,7 +23,7 @@ export async function getAgents(): Promise<Agent[]> {
 export async function getChatModels(): Promise<ChatModel[]> {
   const params = new URLSearchParams();
   params.append("model_types", "chat_completion");
-  const response = await fetch(`${API_BASE_URL}/models/?${params.toString()}`);
+  const response = await apiFetch(`/models/?${params.toString()}`);
   if (!response.ok) throw new Error("Unable to load chat models");
   return response.json();
 }
@@ -78,7 +39,7 @@ export async function sendAgentMessage(
   message: string,
   model: string,
 ): Promise<AgentResponse> {
-  const response = await fetch(`${API_BASE_URL}${agent.endpoint}`, {
+  const response = await apiFetch(`${agent.endpoint}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ message, model }),

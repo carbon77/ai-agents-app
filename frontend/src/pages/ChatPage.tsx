@@ -5,11 +5,11 @@ import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import { Alert, Box, List, Stack, Typography } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getAgents, streamAgentResponse } from "../api";
+import { getAgents, streamAgentResponse } from "../api/agents";
 import { ChatInput } from "../components/ChatInput";
 import { ChatMessage } from "../components/ChatMessage";
 import { ModelSelect } from "../components/ModelSelect";
-import { Shell } from "../components/Shell";
+import { Shell } from "../components/shell/Shell";
 import {
   Agent,
   ChatMessage as ChatMessageType,

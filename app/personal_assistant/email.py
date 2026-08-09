@@ -1,6 +1,6 @@
 from langchain.agents import create_agent
 
-from app.chat_model_registry import chat_model_registry
+from app.agents.registry import chat_model_registry
 from app.personal_assistant.tools import send_email
 
 EMAIL_AGENT_PROMPT = (
